@@ -122,7 +122,7 @@ while True:
                 closed_wa = get_list_closed_wa_send(filename_closed)
                 working_with_closed(closed_deliveries_ls, closed_wa, filename_closed)
                 logger.info('Пауза 180 секунд')
-                time.sleep(180)
+                time.sleep(120)
 
         else:
             TOKEN = get_token(LOGIN, PASSWORD)
