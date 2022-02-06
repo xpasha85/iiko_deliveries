@@ -93,6 +93,18 @@ def get_customer_payment_type(delivery):
     return payment
 
 
+def get_customer_marketing_source(delivery):
+    """Возвращает источник рекламы.
+        На вход подается доставка полностью"""
+
+    # cancelTime = delivery['cancelTime']
+    marketing = delivery['marketingSource']
+    if marketing != None:
+        return marketing['name']
+    else:
+        return 'empty'
+
+
 def parsed_deliveries(deliveries):
     """Возвращает распарсенный список заказов"""
 
@@ -138,6 +150,7 @@ def parsed_deliveries(deliveries):
 
         customer['payment'] = get_customer_payment_type(item)
         customer['items'] = get_parsed_order_amount(item)
+        customer['marketing'] = get_customer_marketing_source(item)
 
         ls.append(customer.copy())
     return ls
@@ -309,7 +322,7 @@ def create_client_in_salebot(token, phone):
         "platform_id": phone,
         "group_id": "22661",
         "client_type": 6
-        }]
+    }]
     response = requests.post(url, json=params)
     if response.status_code != 200:
         logger.info('SALEBOT. Ошибка создания клиента по номеру телефона')
@@ -358,7 +371,7 @@ def send_whatsapp(token, phone, text, is_test: bool):
         return 'ERROR'
 
 
-def making_text_for_message(delivery, type_text):
+def making_text_for_message(delivery, type_text, type_of_direction=''):
     """
         Возвращает форматированный тект для сообщения.
         type_text:
@@ -366,7 +379,18 @@ def making_text_for_message(delivery, type_text):
             'courier_in_time' - доставка курьером на ближайшее
             'pickup_pre_order_print' - самовывоз предзаказ (передан на кухню)
             'courier_pre_order_print' - доставка курьером предзаказ (передан на кухню)
+        type_of_direction:
+            'Брускетта' - заказ брускетта
+            'ЧикенАзия' - заказ с ЧикенАзия который готовится на Точке
     """
+    # выбираем по какому направлению будет формироваться сообщение: Брускетта, ЧикенАзия, БамбукКафе
+    if type_of_direction == 'Брускетта':
+        marketing = 'Брускетта'
+    elif type_of_direction == 'ЧикенАзия':
+        marketing = 'ЧикенАзия'
+    else:
+        marketing = 'BambookCafe'
+
     number = delivery['number']
     name = delivery['name']
     # phone = delivery['phone']
@@ -423,10 +447,10 @@ def making_text_for_message(delivery, type_text):
     text = ''
     if type_text == 'courier_in_time':
         text = f'{name}, здравствуйте 👋\n\n' \
-               f'Ваш заказ уже принят и оформлен в BambookCafe ✅\n' \
+               f'Ваш заказ уже принят и оформлен в {marketing} ✅\n' \
                f'Приготовим 👨‍🍳 и доставим 🚗 для Вас в течение 60-90 минут 🙌 \n\n' \
                f'Ваш заказ № {number}:\n' + order_positions + '\n' \
-               f'Общая сумма заказа: {summ} руб.\n' + payment + \
+                                                              f'Общая сумма заказа: {summ} руб.\n' + payment + \
                f'Адрес: {adr} \n\n' \
                f'Благодарим Вас за заказ ❤'
     if type_text == 'pickup_in_time':
@@ -434,14 +458,14 @@ def making_text_for_message(delivery, type_text):
                f'Ваш заказ уже принят и оформлен в BambookCafe ✅ \n' \
                f'Приготовим 👨‍🍳 для Вас в течение 40-60 минут 🙌 \n\n' \
                f'Ваш заказ № {number}:\n' + order_positions + '\n' \
-               f'Общая сумма заказа: {summ} руб.\n' + payment + \
+                                                              f'Общая сумма заказа: {summ} руб.\n' + payment + \
                f'Благодарим Вас за заказ ❤'
     if type_text == 'courier_pre_order_print':
         text = f'{name}, здравствуйте 👋\n\n' \
                f'Ваш заказ уже принят и оформлен в BambookCafe ✅\n' \
                f'Приготовим 👨‍🍳 и доставим 🚗 для Вас {str_days} в {str_time} 🙌 \n\n' \
                f'Ваш заказ № {number}:\n' + order_positions + '\n' \
-               f'Общая сумма заказа: {summ} руб.\n' + payment + \
+                                                              f'Общая сумма заказа: {summ} руб.\n' + payment + \
                f'Адрес: {adr} \n\n' \
                f'Благодарим Вас за заказ ❤'
     if type_text == 'pickup_pre_order_print':
@@ -449,7 +473,7 @@ def making_text_for_message(delivery, type_text):
                f'Ваш заказ уже принят и оформлен в BambookCafe ✅ \n' \
                f'Приготовим 👨‍🍳 для Вас {str_days} к {str_time} 🙌 \n\n' \
                f'Ваш заказ № {number}:\n' + order_positions + '\n' \
-               f'Общая сумма заказа: {summ} руб.\n' + payment + \
+                                                              f'Общая сумма заказа: {summ} руб.\n' + payment + \
                f'Благодарим Вас за заказ ❤'
     return text
 

@@ -10,8 +10,10 @@ TERMINAL_ID = constants.TERMINAL_ID
 ORG_ID = constants.ORG_ID
 SALEBOT_TOKEN = constants.SALEBOT_TOKEN
 SPECIAL_BLOCK_UNSUBSCRIBE = '3126925'
-SPECIAL_BLOCK_FEEDBACK = '3192632'
-IS_TEST = False
+SPECIAL_BLOCK_FEEDBACK_BAMBOOK = '3192632'
+SPECIAL_BLOCK_FEEDBACK_CHICKEN = '4951179'
+SPECIAL_BLOCK_FEEDBACK_BRUSKETTA = '4951176'
+IS_TEST = True
 
 
 def working_with_cooking(cooking_now, cooking_file, writen_filename):
@@ -79,7 +81,13 @@ def working_with_closed(closed_deliveries, closed_wa_file, writen_filename):
                     item['wa'] = 'YES'
                     client_id = get_id_client_by_whatsapp(SALEBOT_TOKEN, phone)
                     if client_id != 'NO':
-                        migrate_to_special_block(SALEBOT_TOKEN, phone, SPECIAL_BLOCK_FEEDBACK, IS_TEST)
+                        marketing = delivery['marketing']
+                        if marketing == 'Брускетта':
+                            migrate_to_special_block(SALEBOT_TOKEN, phone, SPECIAL_BLOCK_FEEDBACK_BRUSKETTA, IS_TEST)
+                        elif marketing == 'ЧикенАзия':
+                            migrate_to_special_block(SALEBOT_TOKEN, phone, SPECIAL_BLOCK_FEEDBACK_CHICKEN, IS_TEST)
+                        else:
+                            migrate_to_special_block(SALEBOT_TOKEN, phone, SPECIAL_BLOCK_FEEDBACK_BAMBOOK, IS_TEST)
                 else:
                     item['wa'] = 'NO'
                 closed_wa_file.append(item.copy())
@@ -121,8 +129,8 @@ while True:
                 filename_closed = 'data\\sent-wa-closed-' + str(date.today()) + '.txt'
                 closed_wa = get_list_closed_wa_send(filename_closed)
                 working_with_closed(closed_deliveries_ls, closed_wa, filename_closed)
-                logger.info('Пауза 180 секунд')
-                time.sleep(120)
+                logger.info('Пауза 60 секунд')
+                time.sleep(60)
 
         else:
             TOKEN = get_token(LOGIN, PASSWORD)
