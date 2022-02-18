@@ -252,11 +252,14 @@ def check_whatsapp(token, phone):
     url = f"https://chatter.salebot.pro/api/{token}/check_whatsapp?phone={phone}"
     response = requests.get(url)
     if response.status_code == 200:
-        exists = dict(response.json())['exists']
+        try:
+            exists = dict(response.json())['exists']
+        except:
+            exists = False
         if exists:
             logger.info('WhatsApp есть ' + phone)
         else:
-            logger.error('WhatsApp нету! ' + phone)
+            logger.error('WhatsApp нету! Или 502 ошибка' + phone)
         return exists
     else:
         logger.error('Ошибка проверки вотсапа на номере ' + response.text)
@@ -484,16 +487,17 @@ def send_whatsapp_cooking(token, delivery, is_test: bool):
         статус "Готовится".
     """
     phone = delivery['phone']
+    marketing = delivery['marketing']
     if delivery['orderType'] == 'DELIVERY_BY_COURIER':
         if not delivery['pre-order']:
-            text = making_text_for_message(delivery, 'courier_in_time')
+            text = making_text_for_message(delivery, 'courier_in_time', marketing)
         else:
-            text = making_text_for_message(delivery, 'courier_pre_order_print')
+            text = making_text_for_message(delivery, 'courier_pre_order_print', marketing)
     else:
         if not delivery['pre-order']:
-            text = making_text_for_message(delivery, 'pickup_in_time')
+            text = making_text_for_message(delivery, 'pickup_in_time', marketing)
         else:
-            text = making_text_for_message(delivery, 'pickup_pre_order_print')
+            text = making_text_for_message(delivery, 'pickup_pre_order_print', marketing)
     if send_whatsapp(token, phone, text, is_test) == 'OK':
         return 'OK'
     else:
