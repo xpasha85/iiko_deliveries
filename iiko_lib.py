@@ -64,7 +64,7 @@ def get_ard_from_dict(delivery):
     """Возвращает словарь из улицы, дома, квартиры|офиса.
         На вход подается доставка полностью"""
     address = {'street': delivery['address']['street'],
-               'home': delivery['address']['home'] & delivery['address']['housing'],
+               'home': delivery['address']['home'] + delivery['address']['housing'],
                'apartment': delivery['address']['apartment']
                }
     return address
