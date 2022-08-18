@@ -3,6 +3,8 @@ import constants
 from iiko_lib import *
 from loguru import logger
 from datetime import date, timedelta
+# import certifi
+
 
 LOGIN = constants.LOGIN
 PASSWORD = constants.PASSWORD
@@ -103,6 +105,7 @@ def today_at(hr, min=0, sec=0, microsec=0):
 """ тело программы """
 logger.add('logs\\logs.txt', format="{time: DD-MM-YY  HH:mm:ss} {level} "
                                     "{module}:{function}:{line} - {message}", rotation='00:00')
+
 TOKEN = get_token(LOGIN, PASSWORD)
 
 while True:

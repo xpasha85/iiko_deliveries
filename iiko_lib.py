@@ -64,7 +64,7 @@ def get_ard_from_dict(delivery):
     """Возвращает словарь из улицы, дома, квартиры|офиса.
         На вход подается доставка полностью"""
     address = {'street': delivery['address']['street'],
-               'home': delivery['address']['home'],
+               'home': delivery['address']['home'] & delivery['address']['housing'],
                'apartment': delivery['address']['apartment']
                }
     return address
@@ -259,7 +259,7 @@ def check_whatsapp(token, phone):
         if exists:
             logger.info('WhatsApp есть ' + phone)
         else:
-            logger.error('WhatsApp нету! Или 502 ошибка' + phone)
+            logger.error('WhatsApp нету! Или 502 ошибка' + phone + '. ' + response.text)
         return exists
     else:
         logger.error('Ошибка проверки вотсапа на номере ' + response.text)
