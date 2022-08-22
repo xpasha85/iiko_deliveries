@@ -63,8 +63,11 @@ def get_all_deliveries_today(token, org_id, terminal_id):
 def get_ard_from_dict(delivery):
     """Возвращает словарь из улицы, дома, квартиры|офиса.
         На вход подается доставка полностью"""
+    housing = delivery['address']['housing']
+    if not housing:
+        housing = ""
     address = {'street': delivery['address']['street'],
-               'home': delivery['address']['home'] + delivery['address']['housing'],
+               'home': delivery['address']['home'] + housing,
                'apartment': delivery['address']['apartment']
                }
     return address
